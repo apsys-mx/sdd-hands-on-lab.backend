@@ -1,4 +1,4 @@
-# Sistema de Kudos - Backend
+# Catálogo de Libros - Backend
 
 ## Spec Driven Design (SDD)
 
@@ -22,17 +22,18 @@ SDD es una metodología donde:
 
 ---
 
-## El Proyecto: Sistema de Kudos
+## El Proyecto: Catálogo de Libros
 
-Un sistema de reconocimientos entre compañeros de equipo. Permite enviar y recibir "kudos" (reconocimientos) con mensajes y categorías.
+Un sistema para gestionar un catálogo de libros. Permite buscar, visualizar y administrar información de libros con sus autores, categorías y disponibilidad.
 
 ### Funcionalidades
 
-- Enviar kudos a otros usuarios
-- Ver kudos recibidos
-- Ver kudos enviados
-- Filtrar por categoría y fecha
-- Notificaciones de nuevos kudos
+- Buscar libros por título, autor o ISBN
+- Ver detalle de un libro
+- Listar libros por categoría
+- Agregar nuevos libros al catálogo
+- Editar información de libros existentes
+- Marcar libros como favoritos
 
 ---
 
@@ -73,7 +74,7 @@ Crear archivo `.env` en la raíz del proyecto:
 
 ```env
 # Database Configuration
-DATABASE_CONNECTION_STRING=Host=localhost;Port=5432;Database=kudos_db;Username=postgres;Password=your_password
+DATABASE_CONNECTION_STRING=Host=localhost;Port=5432;Database=books_catalog_db;Username=postgres;Password=your_password
 
 # Auth0 Configuration (Hashira Stone Testing)
 AUTH0_AUTHORITY=https://hashira-stone-testing.us.auth0.com/
