@@ -1,0 +1,51 @@
+schema: spec-driven
+
+context: |
+  # Catálogo de Libros - Backend
+
+  ## Dominio
+  Sistema para gestionar un catálogo de libros. Permite buscar, visualizar y
+  administrar información de libros con sus autores, categorías y disponibilidad.
+
+  ## Stack Tecnológico
+  - Runtime: .NET 9.0
+  - Lenguaje: C# 13
+  - WebAPI: FastEndpoints 7.0
+  - ORM: NHibernate 5.5
+  - Base de Datos: PostgreSQL 16.x
+  - Validación: FluentValidation 12.0
+  - Mapeo: AutoMapper 15.0
+  - Result Pattern: FluentResults 3.x
+  - Autenticación: JWT Bearer (Auth0)
+  - Documentación API: Swagger/OpenAPI
+
+  ## Arquitectura
+  Clean Architecture con las siguientes capas:
+  - Domain: Entidades, value objects, interfaces de repositorios y reglas de negocio
+  - Application: Casos de uso, DTOs, validaciones y orquestación
+  - Infrastructure: Implementación de repositorios con NHibernate, servicios externos
+  - WebAPI: Endpoints con FastEndpoints, configuración de autenticación y Swagger
+
+  ## Convenciones
+  - Nombres de proyectos en minúsculas: {proyecto}.backend.{capa}
+  - Usar Result Pattern (FluentResults) para manejo de errores
+  - Endpoints con FastEndpoints (no controllers tradicionales)
+  - Repositorios implementados con NHibernate
+  - Tests con NUnit + Moq + AutoFixture
+
+  ## Guías de Desarrollo
+  Las guías de desarrollo están en docs/guides/ e incluyen:
+  - Patrones fundamentales (domain-modeling, repository, best-practices)
+  - Guías de Clean Architecture
+  - Configuración de stacks tecnológicos
+  - Templates de código reutilizables
+
+rules:
+  proposal:
+    - Mantener propuestas concisas y enfocadas en el problema
+    - Incluir sección de "No-objetivos" cuando sea relevante
+    - Considerar impacto en las capas de Clean Architecture
+  tasks:
+    - Dividir tareas en chunks manejables
+    - Especificar la capa afectada (Domain, Application, Infrastructure, WebAPI)
+    - Incluir consideraciones de testing cuando aplique

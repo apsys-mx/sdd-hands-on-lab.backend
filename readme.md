@@ -60,6 +60,7 @@ Un sistema para gestionar un catálogo de libros. Permite buscar, visualizar y a
 - .NET SDK >= 9.0
 - PostgreSQL >= 16.0
 - Git
+- Node.js (para OpenSpec CLI)
 
 ### 1. Clonar el repositorio
 
@@ -204,3 +205,31 @@ dotnet test --collect:"XPlat Code Coverage"
 - [FastEndpoints Documentation](https://fast-endpoints.com)
 - [NHibernate Documentation](https://nhibernate.info)
 - [Auth0 .NET SDK](https://auth0.com/docs/libraries/auth0-aspnet-core-authentication)
+
+---
+
+## OpenSpec - Spec Driven Design
+
+### Instalar OpenSpec CLI
+
+OpenSpec es la herramienta de línea de comandos para Spec Driven Design:
+
+```bash
+npm install -g @fission-ai/openspec@latest
+```
+
+Verificar la instalación:
+
+```bash
+openspec --version
+```
+
+### Inicializar OpenSpec en el proyecto
+
+Ejecutar en la raíz del proyecto:
+
+```bash
+openspec init
+```
+
+Cuando se solicite seleccionar la herramienta de IA, elegir **Claude Code**.
