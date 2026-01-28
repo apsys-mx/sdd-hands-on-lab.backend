@@ -62,6 +62,32 @@
 
 ## Key Design Decisions
 
+### 0. Schema en NHibernate Mappers (Limitación Técnica)
+
+**Decisión:** Los mappers de NHibernate usan `"public"` hardcoded en lugar de `CustomVersionTableMetaData.SchemaNameValue`.
+
+**Razón:**
+- El proyecto `Infrastructure` no puede referenciar el proyecto `Migrations` (dependencia circular)
+- `CustomVersionTableMetaData` está definido en el proyecto `Migrations`
+- Se usa una constante local `private const string SchemaName = "public";` en cada mapper
+
+**Impacto:**
+- Si el schema cambia, hay que actualizar manualmente cada mapper
+- En la práctica, el schema "public" de PostgreSQL rara vez cambia
+
+```csharp
+// En cada mapper:
+private const string SchemaName = "public";
+
+public BookDaoMapper()
+{
+    Schema(SchemaName);  // En lugar de CustomVersionTableMetaData.SchemaNameValue
+    // ...
+}
+```
+
+---
+
 ### 1. Separación Write Model / Read Model
 
 **Decisión:** Usar entidades para escritura y DAOs para lectura.
@@ -105,12 +131,23 @@ INNER JOIN authors a ON b.author_id = a.id
 - Evita duplicación de propiedades entre Request y Command
 - Permite filtrado avanzado sin modificar el endpoint
 
+**Implementación:** Se usa `EndpointWithoutRequest<T>` en lugar de `Endpoint<TRequest, TResponse>`:
+
 ```csharp
-// En el Endpoint
-var command = new GetManyAndCountBooksUseCase.Command
+// Clase base cuando Request está vacío
+public class GetManyAndCountBooksEndpoint
+    : EndpointWithoutRequest<GetManyAndCountResultDto<BookDto>>
 {
-    Query = HttpContext.Request.QueryString.Value
-};
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var command = new GetManyAndCountBooksUseCase.Command
+        {
+            Query = HttpContext.Request.QueryString.Value
+        };
+        // ...
+        await Send.OkAsync(response, cancellation: ct);  // API: Send.XxxAsync
+    }
+}
 ```
 
 ### 4. Autor como Campos Planos en Respuesta
@@ -356,8 +393,8 @@ La implementación debe seguir el orden de dependencias:
 
 ## Security Considerations
 
-- El endpoint requiere autenticación (comportamiento por defecto de FastEndpoints)
-- No requiere política específica - cualquier usuario autenticado puede listar libros
+- El endpoint es **público** (`AllowAnonymous`) - el catálogo de libros es información pública
+- No requiere autenticación ni política específica
 - No hay información sensible en la respuesta
 - El query string se parsea de forma segura por QueryStringParser (previene SQL injection)
 

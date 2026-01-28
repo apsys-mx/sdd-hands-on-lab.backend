@@ -134,14 +134,20 @@ public interface IBookDaoRepository : IReadOnlyRepository<BookDao, Guid>
 
 ### BookDaoMapper
 
+> **Nota sobre Schema:** El proyecto Infrastructure no puede referenciar el proyecto Migrations
+> (dependencia circular). Por eso se usa una constante local `"public"` en lugar de
+> `CustomVersionTableMetaData.SchemaNameValue`.
+
 ```csharp
 namespace kudos.backend.infrastructure.nhibernate.mappers;
 
 public class BookDaoMapper : ClassMapping<BookDao>
 {
+    private const string SchemaName = "public";  // Hardcoded - no ref a Migrations
+
     public BookDaoMapper()
     {
-        Schema(CustomVersionTableMetaData.SchemaNameValue);
+        Schema(SchemaName);
         Table("books_view");
         Mutable(false);  // CRÍTICO: Previene INSERT/UPDATE
 
@@ -340,6 +346,7 @@ GetManyAndCountResult<BookDao> { Items, Count, PageNumber, PageSize, Sorting }
 - [ ] BookDao NO hereda de AbstractDomainObject
 - [ ] M005CreateBooksView crea vista SQL con JOIN y search_all
 - [ ] BookDaoMapper configurado con `Mutable(false)` y Table("books_view")
+- [ ] BookDaoMapper usa schema hardcoded `"public"` (no ref a Migrations)
 - [ ] IBookDaoRepository hereda de IReadOnlyRepository
 - [ ] IUnitOfWork incluye `BookDaos` en región read-only
 - [ ] NHUnitOfWork implementa BookDaos usando NHReadOnlyRepository

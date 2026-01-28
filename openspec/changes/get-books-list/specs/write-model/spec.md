@@ -387,7 +387,7 @@ public class Sc030CreateBooks(IUnitOfWork uoW) : IScenario
 - [ ] M004CreateBookImagesTable crea tabla con FK cascade a books
 - [ ] IAuthorRepository, IBookRepository, IBookImageRepository definidos
 - [ ] IUnitOfWork actualizado con Authors, Books, BookImages
-- [ ] Mappers NHibernate para las 3 entidades
+- [ ] Mappers NHibernate para las 3 entidades (schema hardcoded `"public"`)
 - [ ] NHUnitOfWork implementa las 3 propiedades de repositorio
 - [ ] Sc020CreateAuthors crea 3 autores de prueba
 - [ ] Sc030CreateBooks crea 6 libros con imágenes (depende de Sc020)

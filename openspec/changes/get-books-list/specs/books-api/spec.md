@@ -12,8 +12,8 @@ GET /api/books
 
 ### Authentication
 
-- Requiere autenticación (cualquier usuario autenticado)
-- No requiere política específica
+- **Público** - No requiere autenticación (`AllowAnonymous`)
+- Decisión: El listado de libros es información pública del catálogo
 
 ---
 
@@ -134,17 +134,6 @@ Parámetros de query inválidos.
   "errors": {
     "pageSize": ["PageSize must be between 1 and 100"]
   }
-}
-```
-
-### 401 Unauthorized
-
-Token de autenticación ausente o inválido.
-
-```json
-{
-  "statusCode": 401,
-  "message": "Unauthorized"
 }
 ```
 
@@ -288,6 +277,9 @@ public abstract class GetManyAndCountBooksUseCase
 
 **GetManyAndCountBooksEndpoint.cs**
 
+> **Nota:** Se usa `EndpointWithoutRequest<T>` porque el Request está vacío (patrón APSYS).
+> Los métodos de envío usan el patrón `Send.OkAsync` / `Send.ErrorsAsync`.
+
 ```csharp
 namespace kudos.backend.webapi.features.books.endpoint;
 
@@ -295,14 +287,14 @@ namespace kudos.backend.webapi.features.books.endpoint;
 /// Endpoint to get a paginated list of books.
 /// </summary>
 public class GetManyAndCountBooksEndpoint(AutoMapper.IMapper mapper)
-    : Endpoint<GetManyAndCountBooksModel.Request, GetManyAndCountBooksModel.Response>
+    : EndpointWithoutRequest<GetManyAndCountResultDto<BookDto>>
 {
     private readonly AutoMapper.IMapper _mapper = mapper;
 
     public override void Configure()
     {
         Get("/api/books");
-        // Sin Policies() - solo requiere autenticación (comportamiento por defecto)
+        AllowAnonymous();  // Endpoint público - catálogo de libros
         Description(d => d
             .WithTags("Books")
             .WithName("GetBooks")
@@ -316,13 +308,10 @@ Query Parameters:
 - sortCriteria: Sort direction 'asc' or 'desc' (default: asc)")
             .Produces<GetManyAndCountBooksModel.Response>(200, "application/json")
             .ProducesProblemDetails(StatusCodes.Status400BadRequest)
-            .ProducesProblemDetails(StatusCodes.Status401Unauthorized)
             .ProducesProblemDetails(StatusCodes.Status500InternalServerError));
     }
 
-    public override async Task HandleAsync(
-        GetManyAndCountBooksModel.Request req,
-        CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
         try
         {
@@ -333,16 +322,16 @@ Query Parameters:
             };
 
             var result = await command.ExecuteAsync(ct);
-            var response = _mapper.Map<GetManyAndCountBooksModel.Response>(result);
+            var response = _mapper.Map<GetManyAndCountResultDto<BookDto>>(result);
 
             Logger.LogInformation("Successfully retrieved {Count} books", result.Count);
-            await SendOkAsync(response, cancellation: ct);
+            await Send.OkAsync(response, cancellation: ct);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to retrieve books");
             AddError($"An unexpected error occurred: {ex.Message}");
-            await SendErrorsAsync(StatusCodes.Status500InternalServerError, cancellation: ct);
+            await Send.ErrorsAsync(statusCode: StatusCodes.Status500InternalServerError, cancellation: ct);
         }
     }
 }
@@ -443,10 +432,10 @@ public class GetManyAndCountBooksEndpointTests : EndpointTestBase
     }
 
     [Test]
-    public async Task GetMany_WithoutAuth_ShouldReturn401()
+    public async Task GetMany_AsAnonymous_ShouldReturn200()
     {
         // Act - GET /api/books sin autenticación
-        // Assert - 401 Unauthorized (solo requiere estar autenticado)
+        // Assert - 200 OK (endpoint es público)
     }
 }
 ```
@@ -460,12 +449,13 @@ public class GetManyAndCountBooksEndpointTests : EndpointTestBase
 - [ ] Paginación (`pageNumber`, `pageSize`) funciona correctamente
 - [ ] Ordenamiento (`sortBy`, `sortCriteria`) funciona para campos válidos
 - [ ] Campos opcionales (category, coverImageUrl) pueden ser null
-- [ ] Retorna 401 si no está autenticado (no requiere política específica)
+- [ ] Endpoint es público (`AllowAnonymous`) - no requiere autenticación
 - [ ] Retorna 400 con parámetros inválidos (pageSize > 100)
 - [ ] Use case usa repositorio de solo lectura BookDaos
-- [ ] Request DTO está vacío (patrón APSYS)
+- [ ] Usa `EndpointWithoutRequest<T>` porque Request está vacío (patrón APSYS)
 - [ ] Query string se obtiene de HttpContext.Request.QueryString.Value
 - [ ] Command se construye manualmente (no con AutoMapper)
 - [ ] Mapping profile mapea BookDao → BookDto y Result → ResultDto
+- [ ] Usa `Send.OkAsync` y `Send.ErrorsAsync` (API de FastEndpoints)
 - [ ] Documentación Swagger con descripción de parámetros
 - [ ] Tests de integración con escenario Sc030CreateBooks
