@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NHibernate;
 using System.Data;
 using System.Reflection;
+using kudos.backend.common.tests;
 using kudos.backend.domain.interfaces.repositories;
 using kudos.backend.infrastructure.nhibernate;
 using kudos.backend.ndbunit;
@@ -23,8 +24,8 @@ public class ScenarioBuilder
     {
         var assemblies = new List<Assembly> { typeof(IScenario).Assembly }.ToArray();
 
-        // Create the NDbUnit instance with empty DataSet
-        // TODO: Replace with AppSchema when XSD is generated
+        // Create the NDbUnit instance
+        // TODO: Replace 'new DataSet("AppSchema")' with 'new AppSchema()' after generating AppSchema.Designer.cs from XSD
         var schema = new DataSet("AppSchema");
         this.NDbUnitTest = new PostgreSQLNDbUnit(schema, connectionString);
 
@@ -66,6 +67,7 @@ public class ScenarioBuilder
         if (!File.Exists(fullFilePath))
             throw new FileNotFoundException($"File {fullFilePath} not found");
 
+        // TODO: Replace 'new DataSet("AppSchema")' with 'new AppSchema()' after generating AppSchema.Designer.cs from XSD
         var dataSet = new DataSet("AppSchema");
         dataSet.ReadXml(fullFilePath);
         this.NDbUnitTest.SeedDatabase(dataSet);
