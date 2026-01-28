@@ -25,10 +25,20 @@ builder.Services
     .ConfigureDependencyInjections(environment)
     .AddLogging()
     .AddAuthorization()
-    .AddFastEndpoints()
+    .AddFastEndpoints(o =>
+    {
+        // Scan application assembly for ICommandHandler implementations
+        o.Assemblies = [
+            typeof(kudos.backend.application.usecases.books.GetManyAndCountBooksUseCase).Assembly
+        ];
+    })
     .SwaggerDocument();
 
 var app = builder.Build();
+
+// Register all Commands and Handlers from the application assembly
+app.Services.RegisterCommandsFromAssembly(typeof(kudos.backend.application.usecases.books.GetManyAndCountBooksUseCase).Assembly);
+
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseCors("CorsPolicy")
@@ -44,10 +54,6 @@ app.UseCors("CorsPolicy")
     opt.DisplayRequestDuration();
     opt.EnableTryItOutByDefault();
 });
-
-// Automatically register all Commands and Handlers from the application assembly
-// TODO: Uncomment and update with actual use case type from your application layer
-// Example: app.Services.RegisterCommandsFromAssembly(typeof(GetManyAndCountUsersUseCase).Assembly);
 
 await app.RunAsync();
 

@@ -25,8 +25,7 @@ public class ScenarioBuilder
         var assemblies = new List<Assembly> { typeof(IScenario).Assembly }.ToArray();
 
         // Create the NDbUnit instance
-        // TODO: Replace 'new DataSet("AppSchema")' with 'new AppSchema()' after generating AppSchema.Designer.cs from XSD
-        var schema = new DataSet("AppSchema");
+        var schema = new AppSchema();
         this.NDbUnitTest = new PostgreSQLNDbUnit(schema, connectionString);
 
         // Create the NHibernate session
@@ -45,8 +44,10 @@ public class ScenarioBuilder
         .AddScoped<IUnitOfWork, NHUnitOfWork>()
         .AddScoped<ISession>(session => nhSessionFactory.OpenSession())
         .AddSingleton<INDbUnit>(NDbUnitTest)
-        // TODO: Register validators for each entity
-        // .AddTransient<AbstractValidator<User>, UserValidator>()
+        // Register validators for each entity
+        .AddTransient<AbstractValidator<kudos.backend.domain.entities.Author>, kudos.backend.domain.validators.AuthorValidator>()
+        .AddTransient<AbstractValidator<kudos.backend.domain.entities.Book>, kudos.backend.domain.validators.BookValidator>()
+        .AddTransient<AbstractValidator<kudos.backend.domain.entities.BookImage>, kudos.backend.domain.validators.BookImageValidator>()
         .BuildServiceProvider();
 
         this.Scenarios = ReadAllScenariosFromAssemblies(assemblies.ToList());
@@ -67,8 +68,7 @@ public class ScenarioBuilder
         if (!File.Exists(fullFilePath))
             throw new FileNotFoundException($"File {fullFilePath} not found");
 
-        // TODO: Replace 'new DataSet("AppSchema")' with 'new AppSchema()' after generating AppSchema.Designer.cs from XSD
-        var dataSet = new DataSet("AppSchema");
+        var dataSet = new AppSchema();
         dataSet.ReadXml(fullFilePath);
         this.NDbUnitTest.SeedDatabase(dataSet);
     }

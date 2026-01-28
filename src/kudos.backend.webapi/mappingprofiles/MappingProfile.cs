@@ -1,4 +1,5 @@
 using AutoMapper;
+using kudos.backend.domain.daos;
 using kudos.backend.domain.interfaces.repositories;
 using kudos.backend.webapi.dtos;
 
@@ -8,6 +9,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        // BookDao -> BookDto mapping
+        CreateMap<BookDao, BookDto>();
 
         // Generic mapping from GetManyAndCountResult<T> to GetManyAndCountResultDto<T>
         CreateMap(typeof(GetManyAndCountResult<>), typeof(GetManyAndCountResultDto<>))

@@ -12,7 +12,20 @@ public interface IUnitOfWork : IDisposable
     * These repositories are used to create, update, delete, and retrieve entities from the database.
     */
 
-    // Agregar repositorios según las entidades del proyecto
+    /// <summary>
+    /// Gets the repository for managing Author entities.
+    /// </summary>
+    IAuthorRepository Authors { get; }
+
+    /// <summary>
+    /// Gets the repository for managing Book entities.
+    /// </summary>
+    IBookRepository Books { get; }
+
+    /// <summary>
+    /// Gets the repository for managing BookImage entities.
+    /// </summary>
+    IBookImageRepository BookImages { get; }
 
     #endregion
 
@@ -23,7 +36,10 @@ public interface IUnitOfWork : IDisposable
      * These repositories are used to retrieve entities from the database without modifying them.
      */
 
-    // Agregar repositorios de solo lectura según las necesidades del proyecto
+    /// <summary>
+    /// Gets the read-only repository for BookDao queries.
+    /// </summary>
+    IBookDaoRepository BookDaos { get; }
 
     #endregion
 

@@ -2,11 +2,13 @@ using FastEndpoints;
 using System.Reflection;
 using FluentValidation;
 using kudos.backend.domain.interfaces.repositories;
+using kudos.backend.infrastructure.nhibernate;
 using kudos.backend.webapi.infrastructure.authorization;
 using kudos.backend.webapi.mappingprofiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using NHibernate;
 
 namespace kudos.backend.webapi.infrastructure;
 
@@ -61,14 +63,16 @@ public static class ServiceCollectionExtender
     /// <param name="configuration"></param>
     public static IServiceCollection ConfigureUnitOfWork(this IServiceCollection services, IConfiguration configuration)
     {
-        //TODO: To be implemented when database is configured with configure-database tool
-        // Example implementation:
-        // services.AddScoped<ISession>((serviceProvider) =>
-        // {
-        //     var sessionFactory = serviceProvider.GetRequiredService<ISessionFactory>();
-        //     return sessionFactory.OpenSession();
-        // });
-        // services.AddScoped<IUnitOfWork, NHUnitOfWork>();
+        string connectionString = ConnectionStringBuilder.Build();
+        var sessionFactory = new NHSessionFactory(connectionString).BuildNHibernateSessionFactory();
+
+        services.AddSingleton<ISessionFactory>(sessionFactory);
+        services.AddScoped<NHibernate.ISession>((serviceProvider) =>
+        {
+            var factory = serviceProvider.GetRequiredService<ISessionFactory>();
+            return factory.OpenSession();
+        });
+        services.AddScoped<IUnitOfWork, NHUnitOfWork>();
         return services;
     }
 

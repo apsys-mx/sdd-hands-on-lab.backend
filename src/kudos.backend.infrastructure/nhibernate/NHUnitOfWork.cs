@@ -1,4 +1,6 @@
+using kudos.backend.domain.daos;
 using kudos.backend.domain.interfaces.repositories;
+using kudos.backend.infrastructure.nhibernate.repositories;
 using NHibernate;
 
 namespace kudos.backend.infrastructure.nhibernate;
@@ -16,14 +18,21 @@ public class NHUnitOfWork : IUnitOfWork
 
     #region crud Repositories
 
-    // Add repositories as needed
-    // Example: public IKudosRepository Kudos => new NHKudosRepository(_session, _serviceProvider);
+    private IAuthorRepository? _authors;
+    public IAuthorRepository Authors => _authors ??= new NHAuthorRepository(_session, _serviceProvider);
+
+    private IBookRepository? _books;
+    public IBookRepository Books => _books ??= new NHBookRepository(_session, _serviceProvider);
+
+    private IBookImageRepository? _bookImages;
+    public IBookImageRepository BookImages => _bookImages ??= new NHBookImageRepository(_session, _serviceProvider);
 
     #endregion
 
     #region read-only Repositories
 
-    // Add read-only repositories as needed
+    private IBookDaoRepository? _bookDaos;
+    public IBookDaoRepository BookDaos => _bookDaos ??= new NHBookDaoRepository(_session);
 
     #endregion
 
