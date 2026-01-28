@@ -75,3 +75,4 @@ buildscenarios.bat
 *.tmp
 *.temp
 *.bak
+nul

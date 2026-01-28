@@ -1,11 +1,12 @@
 namespace kudos.backend.scenarios;
 
 /// <summary>
-/// Empty scenario - just clears the database.
+/// Empty scenario - clears the database.
 /// This is the base scenario that all other scenarios can depend on.
 /// </summary>
-public class Sc010CreateSandBox : IScenario
+public class Sc010CreateSandBox() : IScenario
 {
+
     /// <summary>
     /// Get the scenario file name used to store in the file system
     /// </summary>
@@ -17,8 +18,10 @@ public class Sc010CreateSandBox : IScenario
     public Type? PreloadScenario => null;
 
     /// <summary>
-    /// Seed data - Empty scenario for sandbox
+    /// Seed data - Clean all tables before starting scenarios
     /// </summary>
-    public Task SeedData()
-        => Task.CompletedTask;
+    public async Task SeedData()
+    {
+        // Nothing to do here for sandbox
+    }
 }
